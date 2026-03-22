@@ -15,6 +15,9 @@ def check_spam(text: str) -> str:
         "money",
         "offer",
         "deal",
+        "bonus",
+        "limited",
+        "gurantee"
     ]
 
     hit = 0
