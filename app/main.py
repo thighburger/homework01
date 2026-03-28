@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+from pydantic import BaseModel
 
 try:
     from app.spam import check_spam
@@ -22,12 +23,14 @@ def home():
     with open("static/index.html", encoding="utf-8") as f:
         return f.read()
 
+class ClassifyRequest(BaseModel):
+    text: str   
+
 # classify 요청이 올 때 할 일
 # async: 비동기 처리 (서버가 요청 기다리는 동안 다른 요청도 처리 가능
 @app.post("/classify")
-async def classify(request: Request):
-    payload = await request.json()
-    text = payload["text"]
+async def classify(payload: ClassifyRequest):
+    text = payload.text
     label, score = check_spam(text)
     return {
         "label": label, "score": score
