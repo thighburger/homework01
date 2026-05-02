@@ -47,9 +47,6 @@ async def classify(payload: ClassifyRequest):
     logger.info(f"CALL /classify | text='{text}' | len={len(text)}")
 
     try:
-        if text == "crash":
-            raise RuntimeError("의도적 장애 추가")
-
         label, score = check_spam(text)
         logger.info(f"OK   /classify | label={label} score={score}")
     except Exception as e:
