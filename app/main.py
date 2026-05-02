@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -7,8 +8,10 @@ import uvicorn
 from pydantic import BaseModel
 
 try:
+    from app.issue import create_github_issue
     from app.spam import check_spam
 except ModuleNotFoundError:
+    from issue import create_github_issue
     from spam import check_spam
 
 logging.basicConfig(
@@ -53,6 +56,21 @@ async def classify(payload: ClassifyRequest):
         logger.exception(
             f"FAIL /classify | text='{text}' | error={type(e).__name__}: {e}"
         )
+        tb = traceback.format_exc()
+        title = f"[Prod Error] /classify failed: {type(e).__name__}"
+        body = (
+            "## Summary\n"
+            "- endpoint: /classify\n"
+            f"- input(text, short): `{text}`\n"
+            f"- input length: {len(text)}\n\n"
+            "## Exception\n"
+            f"- type: {type(e).__name__}\n"
+            f"- message: {str(e)}\n\n"
+            "## Traceback (line info)\n"
+            f"```text\n{tb}\n```"
+        )
+        create_github_issue(title, body, logger)
+
         return {"label": "Internal Server Error", "score": -1}
 
     return {
