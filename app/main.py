@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Request
+import logging
+
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -8,6 +10,14 @@ try:
     from app.spam import check_spam
 except ModuleNotFoundError:
     from spam import check_spam
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | "
+    "%(filename)s:%(lineno)d (%(funcName)s) | "
+    "%(message)s",
+)
+logger = logging.getLogger("spamcheck")
 
 # FastAPI 기반 웹 앱 생성
 # /docs (Swagger UI)에 표기되는 이름
@@ -31,7 +41,20 @@ class ClassifyRequest(BaseModel):
 @app.post("/classify")
 async def classify(payload: ClassifyRequest):
     text = payload.text
-    label, score = check_spam(text)
+    logger.info(f"CALL /classify | text='{text}' | len={len(text)}")
+
+    try:
+        if text == "crash":
+            raise RuntimeError("의도적 장애 추가")
+
+        label, score = check_spam(text)
+        logger.info(f"OK   /classify | label={label} score={score}")
+    except Exception as e:
+        logger.exception(
+            f"FAIL /classify | text='{text}' | error={type(e).__name__}: {e}"
+        )
+        return {"label": "Internal Server Error", "score": -1}
+
     return {
         "label": label, "score": score
     }
