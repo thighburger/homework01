@@ -8,11 +8,13 @@ import uvicorn
 from pydantic import BaseModel
 
 try:
+    from app.config import MODEL_MODE
     from app.issue import create_github_issue
-    from app.spam import check_spam
+    from app.spam import check_spam_ml, check_spam_rules
 except ModuleNotFoundError:
+    from config import MODEL_MODE
     from issue import create_github_issue
-    from spam import check_spam
+    from spam import check_spam_ml, check_spam_rules
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,7 +49,10 @@ async def classify(payload: ClassifyRequest):
     logger.info(f"CALL /classify | text='{text}' | len={len(text)}")
 
     try:
-        label, score = check_spam(text)
+        if MODEL_MODE == "ml":
+            label, score = check_spam_ml(text)
+        else:
+            label, score = check_spam_rules(text)
         logger.info(f"OK   /classify | label={label} score={score}")
     except Exception as e:
         logger.exception(
