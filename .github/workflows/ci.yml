@@ -27,7 +27,7 @@ jobs:
       - name: Train ML model
         run: |
           rm -rf mlflow.db mlruns
-          python ml/train.py
+          python -m ml.train
 
       - name: Run tests
         run: pytest

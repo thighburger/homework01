@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN rm -rf mlflow.db mlruns && python ml/train.py
+RUN rm -rf mlflow.db mlruns && python -m ml.train
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]

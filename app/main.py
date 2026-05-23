@@ -10,10 +10,12 @@ from pydantic import BaseModel
 try:
     from app.config import MODEL_MODE
     from app.issue import create_github_issue
+    from app.model_loader import get_model_info
     from app.spam import check_spam_ml, check_spam_rules
 except ModuleNotFoundError:
     from config import MODEL_MODE
     from issue import create_github_issue
+    from model_loader import get_model_info
     from spam import check_spam_ml, check_spam_rules
 
 logging.basicConfig(
@@ -76,7 +78,9 @@ async def classify(payload: ClassifyRequest):
         return {"label": "Internal Server Error", "score": -1}
 
     return {
-        "label": label, "score": score
+        "label": label,
+        "score": score,
+        "model_info": get_model_info(),
     }
 
 # 실행은 운영 환경의 책임으로 남기기 위해 만들지 X

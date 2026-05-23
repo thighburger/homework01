@@ -13,3 +13,7 @@ def test_classify_api_contract():
 
     data = response.json()
     assert "label" in data and "score" in data
+    assert "model_info" in data
+    assert "run_id" in data["model_info"]
+    assert "model_type" in data["model_info"]
+    assert "test_accuracy" in data["model_info"]

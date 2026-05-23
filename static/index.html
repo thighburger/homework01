@@ -10,7 +10,8 @@
   <h1>스팸 판별기</h1>
   <textarea id="text" rows="5" cols="60" placeholder="메시지를 입력하세요"></textarea><br><br>
   <button onclick="classify()">스팸 탐지</button>
-  <h3 id="result"></h3>
+      <h3 id="result"></h3>
+      <pre id="model-info"></pre>
   <script>
     function classify() {
       const text = document.getElementById("text").value;
@@ -18,6 +19,7 @@
 
       if (!text) {
         result.innerText = "메시지를 입력해주세요.";
+        document.getElementById("model-info").innerText = "";
         return;
       }
 
@@ -35,12 +37,18 @@
           return res.json();
         })
         .then(data => {
-          result.innerText =
-            "결과: " + data.label + " (score=" + data.score + ")";
+          result.innerText = "결과: " + data.label + " (score=" + data.score + ")";
+          let info = "";
+          if (data.model_info) {
+            info += "모델: " + data.model_info.model_type + "\n";
+            info += "Test Acc: " + data.model_info.test_accuracy + "\n";
+            info += "Run ID: " + data.model_info.run_id;
+          }
+          document.getElementById("model-info").innerText = info;
         })
         .catch(() => {
-          result.innerText =
-            "에러 발생";
+          result.innerText = "에러 발생";
+          document.getElementById("model-info").innerText = "";
         });
     }
   </script>

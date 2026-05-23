@@ -1,4 +1,7 @@
 .venv
+.venv-broken-*
 .DS_Store
 __pycache__
 *.pyc
+mlruns/**
+ml/artifacts/*_spam_model.joblib
