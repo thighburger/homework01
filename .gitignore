@@ -5,3 +5,8 @@ __pycache__
 *.pyc
 mlruns/**
 ml/artifacts/*_spam_model.joblib
+
+# Homework submission/evidence artifacts
+homework/
+homework_report.*
+screenshots/
